@@ -90,4 +90,4 @@ for package formats, setup and verification limits.
 
 ## Current release
 
-[0.1.0: A searchable catalog of installed skills](docs/releases/0.1.0.md) · [Downloads](https://github.com/pikiby/contextopus-skills/releases/tag/v0.1.0)
+[0.1.0: A searchable catalog of installed skills](https://github.com/pikiby/contextopus-skills/releases/tag/v0.1.0) · [Downloads](https://github.com/pikiby/contextopus-skills/releases/tag/v0.1.0)
