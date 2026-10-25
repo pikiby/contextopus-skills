@@ -1,0 +1,632 @@
+{
+  "id": "skill_catalog",
+  "version": "0.1.0",
+  "core_requires": ">=1.7,<2",
+  "rag": true,
+  "storage": {
+    "engine": "sqlite",
+    "schema_version": 1,
+    "migrations": "migrations",
+    "compatible_versions": {
+      "min": 1,
+      "max": 1
+    }
+  },
+  "service": {
+    "factory": "worker.py:create_service",
+    "ready_timeout": 30,
+    "stop_timeout": 10
+  },
+  "procedures": "procedures",
+  "skills": "skills",
+  "operations": [
+    {
+      "name": "skill_catalog.source_list",
+      "kind": "query",
+      "service": true,
+      "description": "List registered read-only source roots and their file revisions.",
+      "timeout": 120,
+      "arguments_schema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "skill_catalog.source_save",
+      "kind": "execute",
+      "service": true,
+      "description": "Register an explicit skill root. Does not scan, install or change skills.",
+      "timeout": 120,
+      "arguments_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "root": {
+            "type": "string",
+            "minLength": 1
+          },
+          "shell": {
+            "type": "string",
+            "minLength": 1
+          },
+          "origin": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_revision": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "root",
+          "shell",
+          "origin"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "skill_catalog.discover",
+      "kind": "query",
+      "service": true,
+      "description": "Inventory SKILL.md packages in one registered root without changing files.",
+      "timeout": 120,
+      "arguments_schema": {
+        "type": "object",
+        "properties": {
+          "source_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "source_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "skill_catalog.inspect",
+      "kind": "query",
+      "service": true,
+      "description": "Read an unregistered skill package from a registered root; returns actual instruction and file hashes.",
+      "timeout": 120,
+      "arguments_schema": {
+        "type": "object",
+        "properties": {
+          "source_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "location": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "source_id",
+          "location"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "skill_catalog.save",
+      "kind": "execute",
+      "service": true,
+      "description": "Save an agent-reviewed Markdown catalog card and reconcile its shared index. Never writes source skills.",
+      "timeout": 120,
+      "arguments_schema": {
+        "type": "object",
+        "properties": {
+          "record": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "location": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reviewed_revision": {
+                "type": "string",
+                "minLength": 1
+              },
+              "content": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status": {
+                "type": "string",
+                "minLength": 1
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "links": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required_links": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "original_name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "invocation_name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "alias_target": {
+                "type": "string",
+                "minLength": 1
+              },
+              "alias_evidence": {
+                "type": "string",
+                "minLength": 1
+              },
+              "relationship": {
+                "enum": [
+                  "original",
+                  "native_alias",
+                  "forwarder",
+                  "renamed_copy"
+                ]
+              }
+            },
+            "required": [
+              "title",
+              "description",
+              "source_id",
+              "location",
+              "reviewed_revision",
+              "content"
+            ],
+            "additionalProperties": false
+          },
+          "expected_revision": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "record"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "skill_catalog.read",
+      "kind": "query",
+      "service": true,
+      "description": "Read a catalog card, metadata, ordinary and required links.",
+      "timeout": 120,
+      "arguments_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "skill_catalog.source_read",
+      "kind": "query",
+      "service": true,
+      "description": "Read the current instruction and package inventory for a catalog card.",
+      "timeout": 120,
+      "arguments_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "skill_catalog.file_read",
+      "kind": "query",
+      "service": true,
+      "description": "Read a bounded text file of an inspected skill package, without executing it.",
+      "timeout": 120,
+      "arguments_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "file": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_revision": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "file",
+          "expected_revision"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "skill_catalog.list",
+      "kind": "query",
+      "service": true,
+      "description": "List catalog descriptions and source states.",
+      "timeout": 120,
+      "arguments_schema": {
+        "type": "object",
+        "properties": {
+          "filters": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "shell": {
+                "type": "string",
+                "minLength": 1
+              },
+              "origin": {
+                "type": "string",
+                "minLength": 1
+              },
+              "tag": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_state": {
+                "type": "string",
+                "minLength": 1
+              },
+              "original_name": {
+                "type": "string"
+              },
+              "invocation_name": {
+                "type": "string"
+              },
+              "relationship": {
+                "type": "string"
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "skill_catalog.search",
+      "kind": "query",
+      "service": true,
+      "description": "Shared Core semantic search; metadata eligibility precedes selection. Returns descriptions and diagnostics.",
+      "timeout": 120,
+      "arguments_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "minLength": 1
+          },
+          "filters": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "shell": {
+                "type": "string",
+                "minLength": 1
+              },
+              "origin": {
+                "type": "string",
+                "minLength": 1
+              },
+              "tag": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_state": {
+                "type": "string",
+                "minLength": 1
+              },
+              "original_name": {
+                "type": "string"
+              },
+              "invocation_name": {
+                "type": "string"
+              },
+              "relationship": {
+                "type": "string"
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "selection": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "skill_catalog.related",
+      "kind": "query",
+      "service": true,
+      "description": "Find semantic overlap candidates, excluding this card before selection. Similarity is not proof of duplication.",
+      "timeout": 120,
+      "arguments_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "selection": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "skill_catalog.compare",
+      "kind": "query",
+      "service": true,
+      "description": "Compare actual package and instruction hashes and changed file names; semantic assessment belongs to the agent.",
+      "timeout": 120,
+      "arguments_schema": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 2,
+            "maxItems": 4,
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "ids"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "skill_catalog.refresh",
+      "kind": "execute",
+      "service": true,
+      "description": "Refresh source observations after complete inventories, preserve descriptions and flag required reviews. Never deletes source skills.",
+      "timeout": 120,
+      "arguments_schema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "skill_catalog.reconcile",
+      "kind": "execute",
+      "service": true,
+      "description": "Reconcile external card edits/moves/deletions through Core documents, SQL and RAG. Does not scan installed skills.",
+      "timeout": 120,
+      "arguments_schema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "skill_catalog.delete",
+      "kind": "execute",
+      "service": true,
+      "description": "Remove only a catalog card at its current revision; installed source files remain untouched.",
+      "timeout": 120,
+      "arguments_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_revision": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "expected_revision"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "skill_catalog.status",
+      "kind": "query",
+      "service": true,
+      "description": "Show card/index state. Does not scan external roots.",
+      "timeout": 120,
+      "arguments_schema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "skill_catalog.library",
+      "kind": "query",
+      "service": true,
+      "description": "Read-only web Library contribution with module-defined filters.",
+      "timeout": 120,
+      "arguments_schema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "enum": [
+              "collections",
+              "records",
+              "record"
+            ]
+          },
+          "collection": {
+            "type": "string"
+          },
+          "query": {
+            "type": "string"
+          },
+          "mode": {
+            "enum": [
+              "text",
+              "semantic"
+            ]
+          },
+          "type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "filters": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "shell": {
+                "type": "string",
+                "minLength": 1
+              },
+              "origin": {
+                "type": "string",
+                "minLength": 1
+              },
+              "tag": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_state": {
+                "type": "string",
+                "minLength": 1
+              },
+              "original_name": {
+                "type": "string"
+              },
+              "invocation_name": {
+                "type": "string"
+              },
+              "relationship": {
+                "type": "string"
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "additionalProperties": false
+      }
+    }
+  ]
+}
