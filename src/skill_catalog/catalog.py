@@ -5,6 +5,7 @@ External skill packages are read-only. Cards are agent-authored descriptions.
 import hashlib
 import json
 import re
+from pathlib import Path
 from datetime import datetime, timezone
 
 
@@ -115,6 +116,19 @@ class Cards:
         snapshot = sources.inspect(record['source_id'], record['location'])
         if record['reviewed_revision'] != snapshot['package_revision']:
             raise ValueError('Source changed; read it before saving the reviewed description')
+        purposes = record.get('file_purposes')
+        if (not isinstance(purposes, dict) or set(purposes) != set(snapshot['files'])
+                or any(not isinstance(v, str) or not v.strip() for v in purposes.values())):
+            raise ValueError('file_purposes must describe every inspected package file, with no missing or extra paths')
+        record.update(skill_path=snapshot['skill_path'], package_path=snapshot['package_path'],
+                      package_files=snapshot['files'])
+        marker = '\n\n<!-- contextopus-package -->\n'
+        content = content.split(marker, 1)[0].rstrip()
+        details = ['## Installed package', '', 'SKILL.md: ' + snapshot['skill_path'],
+                   '', 'Directory: ' + snapshot['package_path'], '', '### Files', '']
+        for name in snapshot['files']:
+            details.extend([str(Path(snapshot['package_path']) / name), '', purposes[name], ''])
+        content += marker + '\n'.join(details)
         ident = record.setdefault('id', digest(encoded([record['source_id'], record['location']]))[:32])
         docs = self.capture()
         old = docs.get(ident)

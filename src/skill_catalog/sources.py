@@ -99,7 +99,8 @@ def inspect(root, location):
     for field in ('name', 'description'):
         if field in meta and not isinstance(meta[field], str):
             raise ValueError('Skill ' + field + ' must be text')
-    return {'location': location, 'name': meta.get('name') or package.name,
+    return {'location': location, 'skill_path': str(skill), 'package_path': str(package),
+            'name': meta.get('name') or package.name,
             'description': meta.get('description', ''), 'instruction': text,
             'instruction_revision': hashes['SKILL.md'], 'files': hashes,
             'package_revision': digest(json.dumps(hashes, sort_keys=True).encode())}

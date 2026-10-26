@@ -13,6 +13,12 @@ operations:
 ---
 # Maintain the catalog
 
+Use the attached operation schemas. `save.record.file_purposes` must cover the exact
+inventory returned by inspect.files. Core-managed catalog code supplies absolute paths,
+file hashes and the generated package section; the agent authors and verifies meanings.
+Creating or registering the actual skill belongs to the agent using the current environment's
+applicable skills and native tools, only when requested. Saving a card does not install it.
+
 Register only explicit authorized absolute directories using source_save, with a source ID, client/shell and origin (user, repository, plugin or another truthful label). Registration saves a small source Markdown file and does not scan it. Root paths are immutable and may not overlap. No entire-home scan or guessed client directory is implied. Symlink targets can be registered explicitly; nested symlinks are not followed.
 
 Discover reads SKILL.md packages without writing cards. Read skill_catalog/work before creating or revising descriptions and apply its Card contents requirements: verified absolute locations, complete package inventory with content-based file purposes, applicability, tools/dependencies and verified alias links. A source registration or discovered file list alone is not a finished catalog card. refresh updates observations for existing cards and identifies missing installations only after successful complete source inventories. Missing roots, access errors and inventory limits abort that update. Missing skills leave their catalog card available for review; refresh never deletes it or transfers a guessed identity to a new path.

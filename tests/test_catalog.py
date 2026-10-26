@@ -5,6 +5,7 @@ import json
 import pytest
 from contextopus.startup import Application
 from contextopus.core.resources import ProcessResources
+from contextopus.core.operations import OperationInputError
 from contextopus.core.embeddings import default_config
 from contextopus.interfaces.web.backend import LibraryBackend
 
@@ -45,6 +46,7 @@ def save(app,location,source_id='codex',**values):
     snapshot=app.query('skill_catalog.inspect',{'source_id':source_id,'location':location})
     record={'title':'Git reader','description':'Read Git history without modifications.',
         'source_id':source_id,'location':location,'reviewed_revision':snapshot['package_revision'],
+        'file_purposes':{'SKILL.md':'Read-only Git instructions.', 'helper.py':'Synthetic helper source.'},
         'content':'# Git reader\n\nRead Git history. Use for read-only questions. Do not commit.',
         'tags':['git'],'status':'reviewed',**values}
     return app.execute('skill_catalog.save',{'record':record})
@@ -186,7 +188,7 @@ def test_real_http_library(bench):
 
 def test_changed_package_cannot_be_acknowledged_without_new_review(bench):
     app,root=bench;card=save(app,skill(root))
-    record={k:card['metadata'][k] for k in ('id','title','description','source_id','location','reviewed_revision')}
+    record={k:card['metadata'][k] for k in ('id','title','description','source_id','location','reviewed_revision','file_purposes')}
     record['content']='Updated description'
     (root/'git-reader/helper.py').write_text('print(99)')
     with pytest.raises(Exception,match='Source changed'):
@@ -208,8 +210,9 @@ def test_alias_metadata_evidence_filters_and_delete_guard(bench):
     app,source=bench
     original=save(app,skill(source,'original'))
     alias_location=skill(source,'alias')
-    with pytest.raises(Exception,match='evidence'):
+    with pytest.raises(OperationInputError) as rejected:
         save(app,alias_location,relationship='native_alias',alias_target='[['+original['id']+']]')
+    assert rejected.value.payload['error']['execution_started'] is False
     alias=save(app,alias_location,original_name='git-reader',invocation_name='g',
         relationship='native_alias',alias_target='[['+original['id']+']]',
         alias_evidence='Inspected the synthetic client mapping git-reader=g.')

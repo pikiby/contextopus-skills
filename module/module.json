@@ -1,6 +1,6 @@
 {
   "id": "skill_catalog",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "core_requires": ">=1.7,<2",
   "rag": true,
   "storage": {
@@ -121,7 +121,7 @@
       "name": "skill_catalog.save",
       "kind": "execute",
       "service": true,
-      "description": "Save an agent-reviewed Markdown catalog card and reconcile its shared index. Never writes source skills.",
+      "description": "Save an agent-reviewed card and reconcile its shared index. Derives absolute paths and the complete file inventory from the inspected source; file_purposes must match every file. The agent supplies descriptions and purposes after reading. Never writes source skills.",
       "timeout": 120,
       "arguments_schema": {
         "type": "object",
@@ -153,6 +153,11 @@
                 "type": "string",
                 "minLength": 1
               },
+              "file_purposes": {
+                "type": "object",
+                "description": "Every relative file path from inspect.files mapped to its purpose established by the agent after reading.",
+                "additionalProperties": {"type": "string", "minLength": 1}
+              },
               "content": {
                 "type": "string",
                 "minLength": 1
@@ -172,14 +177,16 @@
                 "type": "array",
                 "items": {
                   "type": "string",
-                  "minLength": 1
+                  "minLength": 1,
+                  "pattern": "^\\[\\[[^\\[\\]\\n]+\\]\\]$(?![\\s\\S])"
                 }
               },
               "required_links": {
                 "type": "array",
                 "items": {
                   "type": "string",
-                  "minLength": 1
+                  "minLength": 1,
+                  "pattern": "^\\[\\[[^\\[\\]\\n]+\\]\\]$(?![\\s\\S])"
                 }
               },
               "original_name": {
@@ -213,9 +220,41 @@
               "source_id",
               "location",
               "reviewed_revision",
+              "file_purposes",
               "content"
             ],
-            "additionalProperties": false
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "relationship": {
+                      "enum": [
+                        "native_alias",
+                        "forwarder"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "relationship"
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "alias_target",
+                    "alias_evidence"
+                  ],
+                  "properties": {
+                    "alias_target": {
+                      "pattern": "^\\[\\[[^\\[\\]\\n]+\\]\\]$(?![\\s\\S])"
+                    },
+                    "alias_evidence": {
+                      "pattern": "\\S"
+                    }
+                  }
+                }
+              }
+            ]
           },
           "expected_revision": {
             "type": "string",

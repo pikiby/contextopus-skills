@@ -20,13 +20,13 @@ catalog, not the installations themselves.
 
 ## Install
 
-Use Python 3.12+ and **Core >=1.7,<2**. Download the [0.1.0 module](https://github.com/pikiby/contextopus-skills/releases/download/v0.1.0/contextopus-skills-0.1.0.zip) and verify its checksum.
+Use Python 3.12+ and **Core >=1.7,<2**. Download the [0.2.0 module](https://github.com/pikiby/contextopus-skills/releases/download/v0.2.0/contextopus-skills-0.2.0.zip).
 No changes to Core are needed specifically for this module. Core supplies YAML,
 SQL, documents, the embedding provider, shared RAG and the child service SDK.
 
 ```console
-contextopus modules install skill_catalog --source /path/to/contextopus-skills-0.1.0.zip --plan
-contextopus modules install skill_catalog --source /path/to/contextopus-skills-0.1.0.zip
+contextopus modules install skill_catalog --source /path/to/contextopus-skills-0.2.0.zip --plan
+contextopus modules install skill_catalog --source /path/to/contextopus-skills-0.2.0.zip
 contextopus web
 ```
 
@@ -90,4 +90,4 @@ for package formats, setup and verification limits.
 
 ## Current release
 
-[0.1.0: A searchable catalog of installed skills](https://github.com/pikiby/contextopus-skills/releases/tag/v0.1.0) · [Downloads](https://github.com/pikiby/contextopus-skills/releases/tag/v0.1.0)
+[0.2.0: Complete skill package descriptions](docs/releases/0.2.0.md) · [Downloads](https://github.com/pikiby/contextopus-skills/releases/tag/v0.2.0)
