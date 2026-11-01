@@ -1,7 +1,7 @@
 {
   "id": "skill_catalog",
-  "version": "0.2.0",
-  "core_requires": ">=1.7,<2",
+  "version": "0.3.0",
+  "core_requires": ">=1.9,<2",
   "rag": true,
   "storage": {
     "engine": "sqlite",
