@@ -667,5 +667,27 @@
         "additionalProperties": false
       }
     }
-  ]
+  ],
+  "router": {
+    "routes": [
+      {
+        "id": "work",
+        "when": "Find, inspect, compare and organize installed skills",
+        "procedure": "skill_catalog/work",
+        "order": 310
+      },
+      {
+        "id": "search",
+        "when": "Find skills without changing the catalog",
+        "procedure": "skill_catalog/search",
+        "order": 320
+      },
+      {
+        "id": "catalog",
+        "when": "Register skill sources and maintain catalog cards",
+        "procedure": "skill_catalog/catalog",
+        "order": 330
+      }
+    ]
+  }
 }
